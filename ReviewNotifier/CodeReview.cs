@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
@@ -14,27 +12,29 @@ namespace ReviewNotifier
     {
         private readonly VssConnection _connection;
         private WorkItemTrackingHttpClient _witClient;
-        private readonly IConfigurationRoot _configuration;
+        private readonly LastIdSaver _lastIdSaver;
 
         public CodeReview()
         {
-            _configuration = Configuration.configInstance;
-            var tfsUrl = _configuration.GetSection("tfsUrl").Value;
+            var configuration = Configuration.configInstance;
+            var tfsUrl = configuration.GetSection("tfsUrl").Value;
             var tfsUri = new Uri(tfsUrl);
             _connection = new VssConnection(tfsUri, new VssCredentials());
+            _lastIdSaver = new LastIdSaver();
         }
 
         private Wiql PrepareWiqlQuery()
         {
             var loginBuilder = new LoginBuilder();
+            var lastId = _lastIdSaver.GetValueFromFile();
 
             var createdByQuery = loginBuilder.GetCreateByQuery();
-            var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-1);
+            var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-2000);
 
             var wiql = new Wiql()
             {
                 Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems Where [Work Item Type] = 'Code Review Request' " +
-                        "And [System.TeamProject] = 'ProjectName' And [State] = 'Requested' And [System.CreatedBy] in " +
+                        "And [System.TeamProject] = 'FenergoCore' And [State] = 'Closed' And [System.CreatedBy] in " +
                         createdByQuery + " And [Created Date] > " + DateTimeHelper.GetDateTimeInFormattedType(dateTime) +
                         " Order By [Created Date]"
             };
@@ -45,26 +45,26 @@ namespace ReviewNotifier
         public List<ReviewInfo> ExecuteWiqlQuery()
         {
             var wiql = PrepareWiqlQuery();
-            
-            WorkItemQueryResult workItemQueryResult;
-            List<ReviewInfo> reviewInfos = new List<ReviewInfo>();
+            var reviewInfos = new List<ReviewInfo>();
 
             try
             {
                 _witClient = _connection.GetClient<WorkItemTrackingHttpClient>();
-                workItemQueryResult = _witClient.QueryByWiqlAsync(wiql, true).Result;
-                var Ids = workItemQueryResult?.WorkItems.Select(x => x.Id).ToList();
+
+                var workItemQueryResult = _witClient.QueryByWiqlAsync(wiql, true).Result;
+                var ids = workItemQueryResult?.WorkItems.Select(x => x.Id).Take(1).ToList();
 
                 if (workItemQueryResult.WorkItems != null && workItemQueryResult.WorkItems.Any())
                 {
-                    var newCodeReviewItems = _witClient.GetWorkItemsAsync(Ids, expand: WorkItemExpand.All).Result;
-
+                    var newCodeReviewItems = _witClient.GetWorkItemsAsync(ids, expand: WorkItemExpand.Links).Result;
+                  
                     foreach (var item in newCodeReviewItems)
                     {
                         var info = new ReviewInfo
                         {
                             CreatedBy = item.Fields["System.CreatedBy"].ToString(),
-                            Title = item.Fields["System.Title"].ToString()
+                            Title = item.Fields["System.Title"].ToString(),
+                            WorkItemUrl = BuildUrl(item.Fields["Microsoft.VSTS.CodeReview.Context"].ToString(), item.Fields["Microsoft.VSTS.CodeReview.ContextOwner"].ToString())
                         };
 
                         reviewInfos.Add(info);
@@ -75,8 +75,13 @@ namespace ReviewNotifier
             {
                 Console.WriteLine(ex.Message);
             }
-
+            
             return reviewInfos;
+        }
+
+        private string BuildUrl(string context, string createdBy)
+        {
+            return $"https://secure.fenergo.com/tfs/Product/FenergoCore/_versionControl/shelveset?ss={context};{createdBy}";
         }
     }
 }

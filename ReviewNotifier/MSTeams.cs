@@ -1,21 +1,22 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Net;
+using System.Reflection;
 
 namespace ReviewNotifier
 {
     class MsTeams : IObserver
     {
         private readonly string _webHookUrl;
-
         private readonly string _json;
+        private readonly LastIdSaver _lastIdSaver;
 
-        public MsTeams(string json)
+        public MsTeams()
         {
-            _json = json;
             var configuration = Configuration.configInstance;
             _webHookUrl = configuration.GetSection("WebHookUrl").Value;
+            _json = GetJsonTemplate();
+            _lastIdSaver = new LastIdSaver();
         }
 
         public void Update(ReviewInfo message)
@@ -26,8 +27,8 @@ namespace ReviewNotifier
             httpWebRequest.Method = "POST";
 
             var createdBy = message.CreatedBy.Split(" <FENERGO");
-            var filledJsonTemplate = _json.Replace("$CREATEDBY", createdBy[0]).Replace("$TITLE", message.Title);
-
+            
+            var filledJsonTemplate = _json.Replace("$CREATEDBY", createdBy[0]).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 streamWriter.Write(filledJsonTemplate);
@@ -40,7 +41,7 @@ namespace ReviewNotifier
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    //save id to config
+                    _lastIdSaver.SaveValueToFile(message.Id);
                     Console.WriteLine(result);
                 }
             }
@@ -48,7 +49,12 @@ namespace ReviewNotifier
             {
                 Console.WriteLine(ex.Message);
             }
+        }
 
+        private string GetJsonTemplate()
+        {
+            TextReader textReader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "NotificationTemplate.json"));
+            return textReader.ReadToEnd();
         }
     }
 }

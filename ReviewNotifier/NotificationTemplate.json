@@ -6,8 +6,20 @@
   "sections": [
     {
       "title": "**A new code review**",
-      "activityTitle": "$TITLE",
-      "activitySubtitle": "$CREATEDBY",
+      "facts": [
+        {
+          "name": "Title:",
+          "value": "$TITLE"
+        },
+        {
+          "name": "Created by:",
+          "value": "$CREATEDBY"
+        },
+        {
+          "name": "Link:",
+          "value": "[Open changes]($WORKITEMURL)"
+        }
+      ],
       "markdown": true
     }
   ]
