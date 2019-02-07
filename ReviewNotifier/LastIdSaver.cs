@@ -6,12 +6,25 @@ namespace ReviewNotifier
 {
     class LastIdSaver : ILastIdSaver
     {
-        public long GetValueFromFile()
+        private Object GetJsonContent()
         {
             try
             {
                 string json = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "LastCodeReviewId.json"));
-                dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+
+        public long GetValueFromFile()
+        {
+            try
+            {
+                dynamic jsonObj = GetJsonContent();
                 return Convert.ToInt64(jsonObj["ID"]);
             }
             catch (Exception e)
@@ -25,8 +38,7 @@ namespace ReviewNotifier
         {
             try
             {
-                string json = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "LastCodeReviewId.json"));
-                dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                dynamic jsonObj = GetJsonContent();
                 jsonObj["ID"] = id.ToString();
                 string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "LastCodeReviewId.json"), output);
