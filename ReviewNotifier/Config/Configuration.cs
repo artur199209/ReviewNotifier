@@ -18,18 +18,7 @@ namespace ReviewNotifier.Config
             return _configuration;
         }
 
-        public static IConfigurationRoot configInstance
-        {
-            get
-            {
-                if (_configuration == null)
-                {
-                    _configuration = CreateConfiguration();
-                }
-
-                return _configuration;
-            }
-        }
-
+        public static IConfigurationRoot ConfigInstance => 
+            _configuration ?? (_configuration = CreateConfiguration());
     }
 }
