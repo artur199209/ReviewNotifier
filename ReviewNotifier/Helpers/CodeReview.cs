@@ -18,7 +18,7 @@ namespace ReviewNotifier.Helpers
 
         public CodeReview()
         {
-            var configuration = Configuration.configInstance;
+            var configuration = Configuration.ConfigInstance;
             var tfsUrl = configuration.GetSection("tfsUrl").Value;
             var tfsUri = new Uri(tfsUrl);
             _connection = new VssConnection(tfsUri, new VssCredentials());
@@ -38,6 +38,7 @@ namespace ReviewNotifier.Helpers
                 Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems Where [Work Item Type] = 'Code Review Request' " +
                         "And [System.TeamProject] = 'FenergoCore' And [State] = 'Requested' And [System.CreatedBy] in " +
                         createdByQuery + " And [Created Date] > " + DateTimeHelper.GetDateTimeInFormattedType(dateTime) +
+                        " And [ID] > " + lastId + 
                         " Order By [Created Date]"
             };
 
