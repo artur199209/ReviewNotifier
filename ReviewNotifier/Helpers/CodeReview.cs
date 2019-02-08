@@ -5,8 +5,10 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
+using ReviewNotifier.Config;
+using ReviewNotifier.Models;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Helpers
 {
     class CodeReview
     {
@@ -29,12 +31,12 @@ namespace ReviewNotifier
             var lastId = _lastIdSaver.GetValueFromFile();
 
             var createdByQuery = loginBuilder.GetCreateByQuery();
-            var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-2000);
+            var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-1);
 
             var wiql = new Wiql()
             {
                 Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems Where [Work Item Type] = 'Code Review Request' " +
-                        "And [System.TeamProject] = 'FenergoCore' And [State] = 'Closed' And [System.CreatedBy] in " +
+                        "And [System.TeamProject] = 'FenergoCore' And [State] = 'Requested' And [System.CreatedBy] in " +
                         createdByQuery + " And [Created Date] > " + DateTimeHelper.GetDateTimeInFormattedType(dateTime) +
                         " Order By [Created Date]"
             };
@@ -52,7 +54,7 @@ namespace ReviewNotifier
                 _witClient = _connection.GetClient<WorkItemTrackingHttpClient>();
 
                 var workItemQueryResult = _witClient.QueryByWiqlAsync(wiql, true).Result;
-                var ids = workItemQueryResult?.WorkItems.Select(x => x.Id).Take(1).ToList();
+                var ids = workItemQueryResult?.WorkItems.Select(x => x.Id).ToList();
 
                 if (workItemQueryResult.WorkItems != null && workItemQueryResult.WorkItems.Any())
                 {

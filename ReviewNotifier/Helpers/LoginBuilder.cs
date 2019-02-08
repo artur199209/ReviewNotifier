@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Text;
+using ReviewNotifier.Config;
 
 namespace ReviewNotifier
 {

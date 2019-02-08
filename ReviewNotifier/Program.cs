@@ -1,20 +1,28 @@
 ﻿using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
 using System.Timers;
+using ReviewNotifier.Helpers;
 
 namespace ReviewNotifier
 {
     class Program
     {
+        private static Timer timer;
+
         static void Main(string[] args)
         {
-            Timer timer = new Timer();
+            timer = new Timer();
             timer.AutoReset = true;
-            timer.Interval = 2000;
+            timer.Interval = 60000;
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
             Console.ReadKey();
         }
+
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -28,6 +36,7 @@ namespace ReviewNotifier
             {
                 tfsServer.NotifyAll(item);
             }
+            //Task.Run(() => tfsServer.NotifyAll(msg));
         }
     }
 }

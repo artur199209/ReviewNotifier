@@ -21,16 +21,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="JsonSettings\DevInfo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="JsonSettings\NotificationTemplate.json">
+    <None Update="NotificationTemplate.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="JsonSettings\LastCodeReviewId.json">
+    <None Update="LastCodeReviewId.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="JsonSettings\settings.json">
+    <None Update="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

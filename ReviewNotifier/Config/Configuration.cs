@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Config
 {
     class Configuration
     {
@@ -11,8 +11,8 @@ namespace ReviewNotifier
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("DevInfo.json")
-                .AddJsonFile("settings.json");
+                .AddJsonFile("JsonSettings/DevInfo.json")
+                .AddJsonFile("JsonSettings/settings.json");
             _configuration = builder.Build();
 
             return _configuration;

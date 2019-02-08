@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Helpers
 {
     class LastIdSaver : ILastIdSaver
     {
@@ -10,7 +10,7 @@ namespace ReviewNotifier
         {
             try
             {
-                string json = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "LastCodeReviewId.json"));
+                string json = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/LastCodeReviewId.json"));
                 return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
             }
             catch (Exception e)

@@ -1,4 +1,6 @@
-﻿namespace ReviewNotifier
+﻿using ReviewNotifier.Models;
+
+namespace ReviewNotifier
 {
     interface ITFS
     {

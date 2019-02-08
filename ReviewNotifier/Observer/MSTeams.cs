@@ -2,6 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Reflection;
+using ReviewNotifier.Config;
+using ReviewNotifier.Helpers;
+using ReviewNotifier.Models;
 
 namespace ReviewNotifier
 {
@@ -49,11 +52,12 @@ namespace ReviewNotifier
             {
                 Console.WriteLine(ex.Message);
             }
+
         }
 
         private string GetJsonTemplate()
         {
-            TextReader textReader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "NotificationTemplate.json"));
+            TextReader textReader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/NotificationTemplate.json"));
             return textReader.ReadToEnd();
         }
     }

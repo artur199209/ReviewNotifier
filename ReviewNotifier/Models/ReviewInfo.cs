@@ -1,4 +1,4 @@
-﻿namespace ReviewNotifier
+﻿namespace ReviewNotifier.Models
 {
     public class ReviewInfo
     {
