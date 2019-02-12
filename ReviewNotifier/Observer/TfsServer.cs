@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Observer
 {
     class TfsServer : ITFS
     {
-        private List<IObserver> _observers = new List<IObserver>();
+        private readonly List<IObserver> _observers = new List<IObserver>();
 
         public void AttachObserver(IObserver observer)
         {

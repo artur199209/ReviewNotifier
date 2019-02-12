@@ -14,23 +14,23 @@ namespace ReviewNotifier.Helpers
     {
         private readonly VssConnection _connection;
         private WorkItemTrackingHttpClient _witClient;
-        private readonly LastIdSaver _lastIdSaver;
+        private ILastIdSaver _lastIdSaver;
+        private ILoginBuilder _loginBuilder;
 
-        public CodeReview()
+        public CodeReview(ILastIdSaver lastIdSaver, ILoginBuilder loginBuilder)
         {
             var configuration = Configuration.ConfigInstance;
             var tfsUrl = configuration.GetSection("tfsUrl").Value;
             var tfsUri = new Uri(tfsUrl);
             _connection = new VssConnection(tfsUri, new VssCredentials());
-            _lastIdSaver = new LastIdSaver();
+            _lastIdSaver = lastIdSaver;
+            _loginBuilder = loginBuilder;
         }
 
         private Wiql PrepareWiqlQuery()
         {
-            var loginBuilder = new LoginBuilder();
             var lastId = _lastIdSaver.GetValueFromFile();
-
-            var createdByQuery = loginBuilder.GetCreateByQuery();
+            var createdByQuery = _loginBuilder.GetCreateByQuery();
             var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-1);
 
             var wiql = new Wiql()
@@ -57,7 +57,7 @@ namespace ReviewNotifier.Helpers
                 var workItemQueryResult = _witClient.QueryByWiqlAsync(wiql, true).Result;
                 var ids = workItemQueryResult?.WorkItems.Select(x => x.Id).ToList();
 
-                if (workItemQueryResult.WorkItems != null && workItemQueryResult.WorkItems.Any())
+                if (workItemQueryResult?.WorkItems != null && workItemQueryResult.WorkItems.Any())
                 {
                     var newCodeReviewItems = _witClient.GetWorkItemsAsync(ids, expand: WorkItemExpand.Links).Result;
                   

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using ReviewNotifier.Helpers;
+using ReviewNotifier.Observer;
 
 namespace ReviewNotifier
 {
@@ -26,10 +27,12 @@ namespace ReviewNotifier
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            CodeReview codeReview = new CodeReview();
+            LastIdSaver lastIdSaver = new LastIdSaver();
+            LoginBuilder loginBuilder = new LoginBuilder();
+            CodeReview codeReview = new CodeReview(lastIdSaver, loginBuilder);
             var msg = codeReview.ExecuteWiqlQuery();
             TfsServer tfsServer = new TfsServer();
-            MsTeams msTeams = new MsTeams();
+            MsTeams msTeams = new MsTeams(lastIdSaver);
             tfsServer.AttachObserver(msTeams);
 
             foreach (var item in msg)

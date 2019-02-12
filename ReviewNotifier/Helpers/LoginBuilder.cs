@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using ReviewNotifier.Config;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Helpers
 {
     public class LoginBuilder : ILoginBuilder
     {
@@ -11,7 +11,7 @@ namespace ReviewNotifier
 
         public LoginBuilder()
         {
-            _configuration = Configuration.configInstance;
+            _configuration = Configuration.ConfigInstance;
         }
 
         public StringBuilder GetCreateByQuery()
@@ -39,12 +39,12 @@ namespace ReviewNotifier
             return stringBuilder;
         }
 
-        private string GetLogin(string name, string domain)
+        private static string GetLogin(string name, string domain)
         {
+            const string slash = "\\";
             var person = name.Split(" ");
             var firstName = person[0];
             var lastName = person[1];
-            var slash = "\\";
             var login = $"<{domain}{slash}{firstName[0]}{lastName}>";
             var loginPattern = $"'{firstName} {lastName} {login}'";
 

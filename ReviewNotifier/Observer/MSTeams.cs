@@ -3,23 +3,22 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using ReviewNotifier.Config;
-using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier
+namespace ReviewNotifier.Observer
 {
     class MsTeams : IObserver
     {
         private readonly string _webHookUrl;
         private readonly string _json;
-        private readonly LastIdSaver _lastIdSaver;
+        private readonly ILastIdSaver _lastIdSaver;
 
-        public MsTeams()
+        public MsTeams(ILastIdSaver lastIdSaver)
         {
-            var configuration = Configuration.configInstance;
+            var configuration = Configuration.ConfigInstance;
             _webHookUrl = configuration.GetSection("WebHookUrl").Value;
             _json = GetJsonTemplate();
-            _lastIdSaver = new LastIdSaver();
+            _lastIdSaver = lastIdSaver;
         }
 
         public void Update(ReviewInfo message)
@@ -30,8 +29,8 @@ namespace ReviewNotifier
             httpWebRequest.Method = "POST";
 
             var createdBy = message.CreatedBy.Split(" <FENERGO");
-            
             var filledJsonTemplate = _json.Replace("$CREATEDBY", createdBy[0]).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
+
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 streamWriter.Write(filledJsonTemplate);
@@ -52,7 +51,6 @@ namespace ReviewNotifier
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
 
         private string GetJsonTemplate()
