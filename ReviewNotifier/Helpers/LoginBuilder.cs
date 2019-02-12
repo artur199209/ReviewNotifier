@@ -5,6 +5,7 @@ using ReviewNotifier.Config;
 
 namespace ReviewNotifier.Helpers
 {
+    //TODO cleanup
     public class LoginBuilder : ILoginBuilder
     {
         private readonly IConfigurationRoot _configuration;
@@ -18,7 +19,7 @@ namespace ReviewNotifier.Helpers
         {
             var domain = _configuration.GetSection("Domain").Value;
 
-            var developersSection = _configuration.GetSection("Developers");
+            var developersSection = _configuration.GetSection("developers");
             var developersArray = developersSection.AsEnumerable().ToList();
 
             var stringBuilder = new StringBuilder();
@@ -45,7 +46,7 @@ namespace ReviewNotifier.Helpers
             var person = name.Split(" ");
             var firstName = person[0];
             var lastName = person[1];
-            var login = $"<{domain}{slash}{firstName[0]}{lastName}>";
+            var login = $"<FENERGO{slash}{firstName[0]}{lastName}>";
             var loginPattern = $"'{firstName} {lastName} {login}'";
 
             return loginPattern;
