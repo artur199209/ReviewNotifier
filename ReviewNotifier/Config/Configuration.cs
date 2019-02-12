@@ -11,7 +11,6 @@ namespace ReviewNotifier.Config
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("JsonSettings/DevInfo.json")
                 .AddJsonFile("JsonSettings/settings.json");
             _configuration = builder.Build();
 

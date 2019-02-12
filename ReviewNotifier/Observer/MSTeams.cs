@@ -16,7 +16,7 @@ namespace ReviewNotifier.Observer
         public MsTeams(ILastIdSaver lastIdSaver)
         {
             var configuration = Configuration.ConfigInstance;
-            _webHookUrl = configuration.GetSection("WebHookUrl").Value;
+            _webHookUrl = configuration.GetSection("webHookUrl").Value;
             _json = GetJsonTemplate();
             _lastIdSaver = lastIdSaver;
         }

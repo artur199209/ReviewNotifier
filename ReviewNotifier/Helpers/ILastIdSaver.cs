@@ -3,6 +3,6 @@
     interface ILastIdSaver
     {
         long GetValueFromFile();
-        void SaveValueToFile(long id);
+        void SaveValueToFile(int id);
     }
 }

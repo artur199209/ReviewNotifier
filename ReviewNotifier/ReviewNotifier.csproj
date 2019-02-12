@@ -23,9 +23,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="JsonSettings\DevInfo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="JsonSettings\NotificationTemplate.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

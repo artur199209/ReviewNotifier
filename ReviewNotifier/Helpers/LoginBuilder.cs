@@ -16,9 +16,7 @@ namespace ReviewNotifier.Helpers
 
         public StringBuilder GetCreateByQuery()
         {
-            var domain = _configuration.GetSection("Domain").Value;
-
-            var developersSection = _configuration.GetSection("Developers");
+            var developersSection = _configuration.GetSection("developers");
             var developersArray = developersSection.AsEnumerable().ToList();
 
             var stringBuilder = new StringBuilder();
@@ -26,7 +24,7 @@ namespace ReviewNotifier.Helpers
 
             for (int i = 1; i < developersArray.Count; i++)
             {
-                stringBuilder.Append(GetLogin(developersArray[i].Value, domain));
+                stringBuilder.Append(developersArray[i].Value);
 
                 if (developersArray.Count - 1 != i)
                 {
@@ -37,18 +35,6 @@ namespace ReviewNotifier.Helpers
             stringBuilder.Append(")");
 
             return stringBuilder;
-        }
-
-        private static string GetLogin(string name, string domain)
-        {
-            const string slash = "\\";
-            var person = name.Split(" ");
-            var firstName = person[0];
-            var lastName = person[1];
-            var login = $"<{domain}{slash}{firstName[0]}{lastName}>";
-            var loginPattern = $"'{firstName} {lastName} {login}'";
-
-            return loginPattern;
         }
     }
 }

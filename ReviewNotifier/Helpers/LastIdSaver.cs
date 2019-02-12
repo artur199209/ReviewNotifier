@@ -6,12 +6,13 @@ namespace ReviewNotifier.Helpers
 {
     class LastIdSaver : ILastIdSaver
     {
-        private Object GetJsonContent()
+        private readonly string _path = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/LastCodeReviewId.json");
+        public long GetValueFromFile()
         {
             try
-            {
-                string json = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/LastCodeReviewId.json"));
-                return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            {                
+                string text = File.ReadAllText(_path);
+                return int.Parse(text);
             }
             catch (Exception e)
             {
@@ -20,29 +21,11 @@ namespace ReviewNotifier.Helpers
             }
         }
 
-        public long GetValueFromFile()
+        public void SaveValueToFile(int id)
         {
             try
             {
-                dynamic jsonObj = GetJsonContent();
-                return Convert.ToInt64(jsonObj["ID"]);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        public void SaveValueToFile(long id)
-        {
-            try
-            {
-                dynamic jsonObj = GetJsonContent();
-                jsonObj["ID"] = id.ToString();
-                string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "LastCodeReviewId.json"), output);
-
+                File.WriteAllText(_path, id.ToString());
             }
             catch (Exception e)
             {
