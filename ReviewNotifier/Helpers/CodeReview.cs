@@ -21,8 +21,9 @@ namespace ReviewNotifier.Helpers
         {
             var configuration = Configuration.ConfigInstance;
             var tfsUrl = configuration.GetSection("tfsUrl").Value;
+            var personalAccessToken = configuration.GetSection("personalAccessTokenToTFS").ToString();
             var tfsUri = new Uri(tfsUrl);
-            _connection = new VssConnection(tfsUri, new VssCredentials());
+            _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, personalAccessToken));
             _lastIdSaver = lastIdSaver;
             _loginBuilder = loginBuilder;
         }
