@@ -1,4 +1,5 @@
 {
   "WebHookUrl": "",
-  "tfsUrl": ""
+  "tfsUrl": "",
+  "personalAccessTokenToTFS": ""
 }
