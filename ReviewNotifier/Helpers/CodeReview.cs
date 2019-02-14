@@ -34,13 +34,12 @@ namespace ReviewNotifier.Helpers
         {
             var lastId = _lastIdSaver.GetValueFromFile();
             var createdByQuery = _loginBuilder.GetCreateByQuery();
-            var dateTime = DateTimeHelper.GetCurrentDateTime().ToUniversalTime().AddMinutes(-1);
 
             var wiql = new Wiql()
             {
                 Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems Where [Work Item Type] = 'Code Review Request' " +
                         "And [System.TeamProject] = 'FenergoCore' And [State] = 'Requested' And [System.CreatedBy] in " +
-                        createdByQuery + " And [Created Date] > " + DateTimeHelper.GetDateTimeInFormattedType(dateTime) +
+                        createdByQuery +
                         " And [ID] > " + lastId +
                         " Order By [Created Date]"
             };
