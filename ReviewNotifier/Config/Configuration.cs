@@ -1,23 +1,29 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
+using ReviewNotifier.Helpers;
+using ReviewNotifier.Interfaces;
+using ReviewNotifier.Models;
 
 namespace ReviewNotifier.Config
 {
-    class Configuration
+    public class Configuration : IConfig
     {
-        private static IConfigurationRoot _configuration;
-
-        private static IConfigurationRoot CreateConfiguration()
+        public Settings GetSettings()
         {
-            var builder = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("JsonSettings/settings.json");
-            _configuration = builder.Build();
-
-            return _configuration;
+                .AddJsonFile("JsonSettings/settings.json").Build();
+            var settings = new Settings
+            {
+                WebHookUrl = configuration.GetString("webHookUrl"),
+                TfsUrl = configuration.GetString("tfsUrl"),
+                Project = configuration.GetString("project"),
+                PersonalAccessTokenToTFS = configuration.GetString("personalAccessTokenToTFS"),
+                Developers = configuration.GetSection("developers").AsEnumerable(true).Select(x => x.Value).ToList()
+            };
+            return settings;
         }
-
-        public static IConfigurationRoot ConfigInstance => 
-            _configuration ?? (_configuration = CreateConfiguration());
     }
 }
