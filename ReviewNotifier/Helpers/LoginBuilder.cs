@@ -18,7 +18,7 @@ namespace ReviewNotifier.Helpers
         public string GetCreateByQuery()
         {
             var developersSection = _configuration.GetSection("developers");
-            var developers = developersSection.AsEnumerable().Skip(1).Select(x => $"'{x.Value}'").ToList();
+            var developers = developersSection.AsEnumerable(true).Select(x => $"'{x.Value}'").ToList();
             var joinedDevs = string.Join(",", developers);
             var result = $"({joinedDevs})";
             return result;
