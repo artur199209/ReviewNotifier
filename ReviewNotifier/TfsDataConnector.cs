@@ -10,15 +10,15 @@ using ReviewNotifier.Models;
 
 namespace ReviewNotifier.Helpers
 {
-    class CodeReview
+    class TfsDataConnector
     {
         private readonly VssConnection _connection;
         private WorkItemTrackingHttpClient _witClient;
-        private IIdSettings _iIdSettings;
         private ILoginBuilder _loginBuilder;
         private string _shelvesetUrl;
+        private int _lastId;
 
-        public CodeReview(IIdSettings iIdSettings, ILoginBuilder loginBuilder)
+        public TfsDataConnector(ILoginBuilder loginBuilder, int lastId)
         {
             var configuration = Configuration.ConfigInstance;
             var tfsUrl = configuration.GetSection("tfsUrl").Value;
@@ -26,13 +26,12 @@ namespace ReviewNotifier.Helpers
             _shelvesetUrl = configuration.GetSection("shelvesetUrl").Value;
             var tfsUri = new Uri(tfsUrl);
             _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, personalAccessToken));
-            _iIdSettings = iIdSettings;
             _loginBuilder = loginBuilder;
+            _lastId = lastId;
         }
 
         private Wiql PrepareWiqlQuery()
         {
-            var lastId = _iIdSettings.Get();
             var createdByQuery = _loginBuilder.GetCreateByQuery();
 
             var wiql = new Wiql
@@ -42,14 +41,14 @@ namespace ReviewNotifier.Helpers
                         "And [System.TeamProject] = 'FenergoCore' " +
                         "And [State] = 'Requested' " +
                         "And [System.CreatedBy] in " + createdByQuery +
-                        " And [ID] > " + lastId +
-                        " Order By [Created Date]"
+                        "And [ID] > " + _lastId +
+                        "Order By [Created Date]"
             };
 
             return wiql;
         }
 
-        public List<ReviewInfo> ExecuteWiqlQuery()
+        public List<ReviewInfo> GetReviewData()
         {
             var wiql = PrepareWiqlQuery();
             var reviewInfos = new List<ReviewInfo>();
@@ -64,19 +63,14 @@ namespace ReviewNotifier.Helpers
                 {
                     var ids = workItemQueryResult.WorkItems.Select(x => x.Id).ToList();
                     var newCodeReviewItems = _witClient.GetWorkItemsAsync(ids, expand: WorkItemExpand.Links).Result;
-                  
-                    foreach (var item in newCodeReviewItems)
-                    {
-                        var info = new ReviewInfo
-                        {
-                            Id = item.Id.GetValueOrDefault(0),
-                            CreatedBy = item.Fields["System.CreatedBy"].ToString(),
-                            Title = item.Fields["System.Title"].ToString(),
-                            WorkItemUrl = BuildUrl(item.Fields["Microsoft.VSTS.CodeReview.Context"].ToString(), item.Fields["Microsoft.VSTS.CodeReview.ContextOwner"].ToString())
-                        };
 
-                        reviewInfos.Add(info);
-                    }
+                    reviewInfos = newCodeReviewItems.Select(item => new ReviewInfo
+                    {
+                        Id = item.Id.GetValueOrDefault(0),
+                        CreatedBy = item.Fields["System.CreatedBy"].ToString(),
+                        Title = item.Fields["System.Title"].ToString(),
+                        WorkItemUrl = BuildUrl(item.Fields["Microsoft.VSTS.CodeReview.Context"].ToString(), item.Fields["Microsoft.VSTS.CodeReview.ContextOwner"].ToString())
+                    }).ToList();
                 }
             }
             catch (Exception ex)
