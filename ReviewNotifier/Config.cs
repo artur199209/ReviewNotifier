@@ -16,7 +16,7 @@ namespace ReviewNotifier
                 .AddJsonFile("JsonSettings/settings.json").Build();
             var settings = new Settings
             {
-                WebHookUrl = configuration.GetString("webHookUrl"),
+                WebHookUrl = configuration.GetString("webHookUrl").TrimEnd('/')+"/",
                 TfsUrl = configuration.GetString("tfsUrl"),
                 Project = configuration.GetString("project"),
                 PersonalAccessTokenToTFS = configuration.GetString("personalAccessTokenToTFS"),

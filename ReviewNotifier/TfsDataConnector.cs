@@ -19,7 +19,7 @@ namespace ReviewNotifier
 
         public TfsDataConnector(Settings settings, ILoginBuilder loginBuilder, int lastId)
         {
-            //_shelvesetUrl = configuration.GetSection("shelvesetUrl").Value;
+            _shelvesetUrl = $"{settings.TfsUrl}_versionControl/shelvesets";
             var tfsUri = new Uri(settings.TfsUrl);
             _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, settings.PersonalAccessTokenToTFS));
             _loginBuilder = loginBuilder;
@@ -79,7 +79,7 @@ namespace ReviewNotifier
 
         private string BuildUrl(string context, string createdBy)
         {
-            return $"{_shelvesetUrl}{context};{createdBy}";
+            return $"{_shelvesetUrl}?ss={context};{createdBy}";
         }
     }
 }
