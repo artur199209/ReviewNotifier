@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using ReviewNotifier.Config;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Helpers
+namespace ReviewNotifier
 {
     class TfsDataConnector
     {
@@ -18,14 +18,11 @@ namespace ReviewNotifier.Helpers
         private string _shelvesetUrl;
         private int _lastId;
 
-        public TfsDataConnector(ILoginBuilder loginBuilder, int lastId)
+        public TfsDataConnector(Settings settings, ILoginBuilder loginBuilder, int lastId)
         {
-            var configuration = Configuration.ConfigInstance;
-            var tfsUrl = configuration.GetSection("tfsUrl").Value;
-            var personalAccessToken = configuration.GetSection("personalAccessTokenToTFS").Value;
-            _shelvesetUrl = configuration.GetSection("shelvesetUrl").Value;
-            var tfsUri = new Uri(tfsUrl);
-            _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, personalAccessToken));
+            //_shelvesetUrl = configuration.GetSection("shelvesetUrl").Value;
+            var tfsUri = new Uri(settings.TfsUrl);
+            _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, settings.PersonalAccessTokenToTFS));
             _loginBuilder = loginBuilder;
             _lastId = lastId;
         }

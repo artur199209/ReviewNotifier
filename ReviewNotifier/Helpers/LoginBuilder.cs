@@ -1,24 +1,22 @@
-﻿using System.Collections.Generic;
+﻿
+
+using ReviewNotifier.Models;
 using System.Linq;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using ReviewNotifier.Config;
 
 namespace ReviewNotifier.Helpers
 {
     public class LoginBuilder : ILoginBuilder
     {
-        private readonly IConfiguration _configuration;
+        private readonly Settings _settings;
 
-        public LoginBuilder(IConfiguration configuration)
+        public LoginBuilder(Settings settings)
         {
-            _configuration = configuration;
+            _settings = settings;
         }
 
         public string GetCreateByQuery()
         {
-            var developersSection = _configuration.GetSection("developers");
-            var developers = developersSection.AsEnumerable(true).Select(x => $"'{x.Value}'").ToList();
+            var developers = _settings.Developers.Select(x => $"'{x}'").ToList();
             var joinedDevs = string.Join(",", developers);
             var result = $"({joinedDevs})";
             return result;

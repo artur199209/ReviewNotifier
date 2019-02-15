@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 using System.Timers;
 using ReviewNotifier.Helpers;
 using ReviewNotifier.Observer;
-using Microsoft.Extensions.Configuration;
+using ReviewNotifier.Models;
 
 namespace ReviewNotifier
 {
     class Program
     {
-        private static IConfiguration _configuration;
+        private static Settings _settings;
         private static LastIdSettings _lastIdSettings;
         private static TeamsNotifier _teams;
         private static LoginBuilder _loginBuilder;
@@ -25,13 +25,12 @@ namespace ReviewNotifier
 
         static void Main(string[] args)
         {
-            _configuration = Configuration.ConfigInstance;
+            _settings = new Configuration().GetSettings();
             _lastIdSettings = new LastIdSettings();
             _lastId = _lastIdSettings.Get();
-            _webHookUrl = _configuration.GetSection("webHookUrl").Value;
             _teams = new TeamsNotifier(_webHookUrl);
-            _loginBuilder = new LoginBuilder(_configuration);
-            _tfs = new TfsDataConnector(_loginBuilder, _lastId);
+            _loginBuilder = new LoginBuilder(_settings);
+            _tfs = new TfsDataConnector(_settings, _loginBuilder, _lastId);
 
             timer = new Timer
             {
