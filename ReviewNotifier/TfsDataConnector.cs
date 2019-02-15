@@ -1,85 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using Newtonsoft.Json;
+using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
 namespace ReviewNotifier
 {
     class TfsDataConnector
     {
-        private readonly VssConnection _connection;
-        private WorkItemTrackingHttpClient _witClient;
         private ILoginBuilder _loginBuilder;
+        private string _url;
         private string _shelvesetUrl;
         private int _lastId;
+        private static HttpClient client;
 
         public TfsDataConnector(Settings settings, ILoginBuilder loginBuilder, int lastId)
         {
-            _shelvesetUrl = $"{settings.TfsUrl}_versionControl/shelvesets";
-            var tfsUri = new Uri(settings.TfsUrl);
-            _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, settings.PersonalAccessTokenToTFS));
+            _url = settings.TfsUrl;
             _loginBuilder = loginBuilder;
             _lastId = lastId;
+
+            client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format(":{0}", settings.PersonalAccessTokenToTFS))));
         }
 
-        private Wiql PrepareWiqlQuery()
+        private string PrepareWiqlQuery()
         {
             var createdByQuery = _loginBuilder.GetCreateByQuery();
-
-            var wiql = new Wiql
-            {
-                Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems " +
-                        "Where [Work Item Type] = 'Code Review Request' " +
-                        "And [System.TeamProject] = 'FenergoCore' " +
-                        "And [State] = 'Requested' " +
-                        "And [System.CreatedBy] in " + createdByQuery +
-                        "And [ID] > " + _lastId +
-                        "Order By [Created Date]"
-            };
-
-            return wiql;
+            var query = "Select [ID] From WorkItems " +
+                        " Where [Work Item Type] = 'Code Review Request' " +
+                        " And [State] = 'Requested' " +
+                        " And [System.CreatedBy] in " + createdByQuery +
+                        " And [ID] > " + _lastId +
+                        " Order By [Created Date] DESC";
+            return query;
         }
 
         public List<CodeReview> GetReviewData()
         {
             var wiql = PrepareWiqlQuery();
-            var reviewInfos = new List<CodeReview>();
+            var codeReviews = new List<CodeReview>();
 
             try
             {
-                _witClient = _connection.GetClient<WorkItemTrackingHttpClient>();
 
-                var workItemQueryResult = _witClient.QueryByWiqlAsync(wiql, true).Result;
-
-                if (workItemQueryResult?.WorkItems != null && workItemQueryResult.WorkItems.Any())
-                {
-                    var ids = workItemQueryResult.WorkItems.Select(x => x.Id).ToList();
-                    var newCodeReviewItems = _witClient.GetWorkItemsAsync(ids, expand: WorkItemExpand.Links).Result;
-
-                    reviewInfos = newCodeReviewItems.Select(item => new CodeReview
-                    {
-                        Id = item.Id.GetValueOrDefault(0),
-                        CreatedBy = item.Fields["System.CreatedBy"].ToString(),
-                        Title = item.Fields["System.Title"].ToString(),
-                        WorkItemUrl = BuildUrl(item.Fields["Microsoft.VSTS.CodeReview.Context"].ToString(), item.Fields["Microsoft.VSTS.CodeReview.ContextOwner"].ToString())
-                    }).ToList();
-                }
+                var response = client.PostWithResponse<WorkItemResults>($"{_url}/_apis/wit/wiql?$top=15&api-version=3.0", wiql);
+                if (!response.workItems.Any()) return codeReviews;
+                var joinedWorkItemIds = string.Join(",", response.workItems.Select(x => x.id).Distinct().ToList());
+                var qwe = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,System.CreatedBy,System.Title,System.Id&api-version=3.0";
+                codeReviews = client.GetWithResponse<WorkItemResults>(qwe).value.Select(x => x.fields).ToList();
+                codeReviews.ForEach(x => x.BuildUrl(_url));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
             
-            return reviewInfos;
+            return codeReviews;
         }
 
-        private string BuildUrl(string context, string createdBy)
-        {
-            return $"{_shelvesetUrl}?ss={context};{createdBy}";
-        }
     }
 }
