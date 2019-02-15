@@ -12,14 +12,12 @@ namespace ReviewNotifier.Observer
     {
         private readonly string _webHookUrl;
         private readonly string _json;
-        private readonly ILastIdSaver _lastIdSaver;
 
-        public MsTeams(ILastIdSaver lastIdSaver)
+        public MsTeams()
         {
             var configuration = Configuration.ConfigInstance;
             _webHookUrl = configuration.GetSection("webHookUrl").Value;
             _json = GetJsonTemplate();
-            _lastIdSaver = lastIdSaver;
         }
 
         public void Update(ReviewInfo message)
@@ -44,7 +42,6 @@ namespace ReviewNotifier.Observer
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    _lastIdSaver.SaveValueToFile(message.Id);
                     Console.WriteLine(result);
                 }
             }

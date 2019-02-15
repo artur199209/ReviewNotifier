@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -15,31 +16,38 @@ namespace ReviewNotifier
 
         static void Main(string[] args)
         {
-            timer = new Timer();
-            timer.AutoReset = true;
-            timer.Interval = 60000;
+            timer = new Timer
+            {
+                AutoReset = true,
+                Interval = 60000
+            };
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
-
+            //Timer_Elapsed(null, null);
             Console.ReadKey();
         }
 
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            LastIdSaver lastIdSaver = new LastIdSaver();
-            LoginBuilder loginBuilder = new LoginBuilder();
-            CodeReview codeReview = new CodeReview(lastIdSaver, loginBuilder);
+            var lastIdSettings = new LastIdSettings();
+            var loginBuilder = new LoginBuilder();
+
+            var lastId = lastIdSettings.Get();
+            var codeReview = new CodeReview(loginBuilder, lastId);
             var msg = codeReview.ExecuteWiqlQuery();
-            TfsServer tfsServer = new TfsServer();
-            MsTeams msTeams = new MsTeams(lastIdSaver);
+            var tfsServer = new TfsServer();
+            var msTeams = new MsTeams();
             tfsServer.AttachObserver(msTeams);
 
             foreach (var item in msg)
             {
                 tfsServer.NotifyAll(item);
             }
-            //Task.Run(() => tfsServer.NotifyAll(msg));
+
+            lastId = msg.Any() ? msg.Max(x => x.Id) : 1;
+            lastIdSettings.Save(lastId);
+
         }
     }
 }
