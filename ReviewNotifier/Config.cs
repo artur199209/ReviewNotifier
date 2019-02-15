@@ -18,7 +18,6 @@ namespace ReviewNotifier
             {
                 WebHookUrl = configuration.GetString("webHookUrl").TrimEnd('/')+"/",
                 TfsUrl = configuration.GetString("tfsUrl"),
-                Project = configuration.GetString("project"),
                 PersonalAccessTokenToTFS = configuration.GetString("personalAccessTokenToTFS"),
                 Developers = configuration.GetSection("developers").AsEnumerable(true).Select(x => x.Value).ToList()
             };
