@@ -1,6 +1,6 @@
 ﻿using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Observer
+namespace ReviewNotifier
 {
     interface INotifier
     {

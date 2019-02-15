@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
-using ReviewNotifier.Config;
 using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Observer
+namespace ReviewNotifier
 {
     public class TeamsNotifier : INotifier
     {

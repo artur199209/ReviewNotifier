@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace ReviewNotifier
+﻿namespace ReviewNotifier
 {
     interface ILoginBuilder
     {

@@ -1,6 +1,4 @@
-﻿
-
-using ReviewNotifier.Models;
+﻿using ReviewNotifier.Models;
 using System.Linq;
 
 namespace ReviewNotifier.Helpers

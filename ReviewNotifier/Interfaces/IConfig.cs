@@ -1,7 +1,7 @@
 ﻿
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Interfaces
+namespace ReviewNotifier
 {
     interface IConfig
     {

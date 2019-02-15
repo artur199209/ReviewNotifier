@@ -3,12 +3,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using ReviewNotifier.Helpers;
-using ReviewNotifier.Interfaces;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Config
+namespace ReviewNotifier
 {
-    public class Configuration : IConfig
+    public class Config : IConfig
     {
         public Settings GetSettings()
         {

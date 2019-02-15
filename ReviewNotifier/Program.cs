@@ -1,13 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using ReviewNotifier.Config;
-using System.Threading.Tasks;
 using System.Timers;
 using ReviewNotifier.Helpers;
-using ReviewNotifier.Observer;
 using ReviewNotifier.Models;
 
 namespace ReviewNotifier
@@ -21,14 +15,13 @@ namespace ReviewNotifier
         private static TfsDataConnector _tfs;
         private static Timer timer;
         private static int _lastId;
-        private static string _webHookUrl;
 
         static void Main(string[] args)
         {
-            _settings = new Configuration().GetSettings();
+            _settings = new Config().GetSettings();
             _lastIdSettings = new LastIdSettings();
             _lastId = _lastIdSettings.Get();
-            _teams = new TeamsNotifier(_webHookUrl);
+            _teams = new TeamsNotifier(_settings.WebHookUrl);
             _loginBuilder = new LoginBuilder(_settings);
             _tfs = new TfsDataConnector(_settings, _loginBuilder, _lastId);
 
