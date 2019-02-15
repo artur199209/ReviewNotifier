@@ -8,18 +8,18 @@ using ReviewNotifier.Models;
 
 namespace ReviewNotifier.Observer
 {
-    class MsTeams : IObserver
+    public class TeamsNotifier : INotifier
     {
         private readonly string _webHookUrl;
         private readonly string _json;
 
-        public MsTeams(string webHookUrl)
+        public TeamsNotifier(string webHookUrl)
         {
             _webHookUrl = webHookUrl;
             _json = GetJsonTemplate();
         }
 
-        public void Update(ReviewInfo message)
+        public void Send(ReviewInfo message)
         {
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";

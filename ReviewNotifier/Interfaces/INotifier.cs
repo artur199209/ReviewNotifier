@@ -2,8 +2,8 @@
 
 namespace ReviewNotifier.Observer
 {
-    interface IObserver
+    interface INotifier
     {
-        void Update(ReviewInfo message);
+        void Send(ReviewInfo message);
     }
 }

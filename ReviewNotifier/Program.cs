@@ -35,15 +35,15 @@ namespace ReviewNotifier
             var webHookUrl = configuration.GetSection("webHookUrl").Value;
             var lastIdSettings = new LastIdSettings();
             var loginBuilder = new LoginBuilder(configuration);
-            var msTeams = new MsTeams(webHookUrl);
+            var teams = new TeamsNotifier(webHookUrl);
 
             var lastId = lastIdSettings.Get();
             var tfs = new TfsDataConnector(loginBuilder, lastId);
             var reviews = tfs.GetReviewData();
 
-            foreach (var item in reviews)
+            foreach (var review in reviews)
             {
-                msTeams.Update(item);
+                teams.Send(review);
             }
 
             lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
