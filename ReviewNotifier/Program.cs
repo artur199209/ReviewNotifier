@@ -8,15 +8,31 @@ using System.Threading.Tasks;
 using System.Timers;
 using ReviewNotifier.Helpers;
 using ReviewNotifier.Observer;
+using Microsoft.Extensions.Configuration;
 
 namespace ReviewNotifier
 {
     class Program
     {
+        private static IConfiguration _configuration;
+        private static LastIdSettings _lastIdSettings;
+        private static TeamsNotifier _teams;
+        private static LoginBuilder _loginBuilder;
+        private static TfsDataConnector _tfs;
         private static Timer timer;
+        private static int _lastId;
+        private static string _webHookUrl;
 
         static void Main(string[] args)
         {
+            _configuration = Configuration.ConfigInstance;
+            _lastIdSettings = new LastIdSettings();
+            _lastId = _lastIdSettings.Get();
+            _webHookUrl = _configuration.GetSection("webHookUrl").Value;
+            _teams = new TeamsNotifier(_webHookUrl);
+            _loginBuilder = new LoginBuilder(_configuration);
+            _tfs = new TfsDataConnector(_loginBuilder, _lastId);
+
             timer = new Timer
             {
                 AutoReset = true,
@@ -31,23 +47,15 @@ namespace ReviewNotifier
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            var configuration = Configuration.ConfigInstance;
-            var webHookUrl = configuration.GetSection("webHookUrl").Value;
-            var lastIdSettings = new LastIdSettings();
-            var loginBuilder = new LoginBuilder(configuration);
-            var teams = new TeamsNotifier(webHookUrl);
-
-            var lastId = lastIdSettings.Get();
-            var tfs = new TfsDataConnector(loginBuilder, lastId);
-            var reviews = tfs.GetReviewData();
+            var reviews = _tfs.GetReviewData();
 
             foreach (var review in reviews)
             {
-                teams.Send(review);
+                _teams.Send(review);
             }
 
-            lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
-            lastIdSettings.Save(lastId);
+            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
+            _lastIdSettings.Save(_lastId);
 
         }
     }
