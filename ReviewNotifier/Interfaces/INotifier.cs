@@ -4,6 +4,6 @@ namespace ReviewNotifier
 {
     interface INotifier
     {
-        void Send(ReviewInfo message);
+        void Send(CodeReview message);
     }
 }

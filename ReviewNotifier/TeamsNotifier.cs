@@ -17,7 +17,7 @@ namespace ReviewNotifier
             _json = GetJsonTemplate();
         }
 
-        public void Send(ReviewInfo message)
+        public void Send(CodeReview message)
         {
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";

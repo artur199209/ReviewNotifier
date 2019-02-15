@@ -1,6 +1,6 @@
 ﻿namespace ReviewNotifier.Models
 {
-    public class ReviewInfo
+    public class CodeReview
     {
         public int Id { get; set; }
         public string Title { get; set; }

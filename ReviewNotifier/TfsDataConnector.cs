@@ -44,10 +44,10 @@ namespace ReviewNotifier
             return wiql;
         }
 
-        public List<ReviewInfo> GetReviewData()
+        public List<CodeReview> GetReviewData()
         {
             var wiql = PrepareWiqlQuery();
-            var reviewInfos = new List<ReviewInfo>();
+            var reviewInfos = new List<CodeReview>();
 
             try
             {
@@ -60,7 +60,7 @@ namespace ReviewNotifier
                     var ids = workItemQueryResult.WorkItems.Select(x => x.Id).ToList();
                     var newCodeReviewItems = _witClient.GetWorkItemsAsync(ids, expand: WorkItemExpand.Links).Result;
 
-                    reviewInfos = newCodeReviewItems.Select(item => new ReviewInfo
+                    reviewInfos = newCodeReviewItems.Select(item => new CodeReview
                     {
                         Id = item.Id.GetValueOrDefault(0),
                         CreatedBy = item.Fields["System.CreatedBy"].ToString(),
