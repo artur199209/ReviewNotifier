@@ -4,6 +4,6 @@ namespace ReviewNotifier
 {
     interface ILoginBuilder
     {
-        StringBuilder GetCreateByQuery();
+        string GetCreateByQuery();
     }
 }
