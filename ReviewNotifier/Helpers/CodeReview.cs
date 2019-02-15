@@ -14,11 +14,11 @@ namespace ReviewNotifier.Helpers
     {
         private readonly VssConnection _connection;
         private WorkItemTrackingHttpClient _witClient;
-        private ILastIdSaver _lastIdSaver;
+        private IIdSettings _iIdSettings;
         private ILoginBuilder _loginBuilder;
         private string _shelvesetUrl;
 
-        public CodeReview(ILastIdSaver lastIdSaver, ILoginBuilder loginBuilder)
+        public CodeReview(IIdSettings iIdSettings, ILoginBuilder loginBuilder)
         {
             var configuration = Configuration.ConfigInstance;
             var tfsUrl = configuration.GetSection("tfsUrl").Value;
@@ -26,20 +26,22 @@ namespace ReviewNotifier.Helpers
             _shelvesetUrl = configuration.GetSection("shelvesetUrl").Value;
             var tfsUri = new Uri(tfsUrl);
             _connection = new VssConnection(tfsUri, new VssBasicCredential(string.Empty, personalAccessToken));
-            _lastIdSaver = lastIdSaver;
+            _iIdSettings = iIdSettings;
             _loginBuilder = loginBuilder;
         }
 
         private Wiql PrepareWiqlQuery()
         {
-            var lastId = _lastIdSaver.GetValueFromFile();
+            var lastId = _iIdSettings.Get();
             var createdByQuery = _loginBuilder.GetCreateByQuery();
 
-            var wiql = new Wiql()
+            var wiql = new Wiql
             {
-                Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems Where [Work Item Type] = 'Code Review Request' " +
-                        "And [System.TeamProject] = 'FenergoCore' And [State] = 'Requested' And [System.CreatedBy] in " +
-                        createdByQuery +
+                Query = "Select [ID], [State], [Title], [Work Item Type] From WorkItems " +
+                        "Where [Work Item Type] = 'Code Review Request' " +
+                        "And [System.TeamProject] = 'FenergoCore' " +
+                        "And [State] = 'Requested' " +
+                        "And [System.CreatedBy] in " + createdByQuery +
                         " And [ID] > " + lastId +
                         " Order By [Created Date]"
             };

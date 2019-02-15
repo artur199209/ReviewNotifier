@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 
 namespace ReviewNotifier.Helpers
 {
-    class LastIdSaver : ILastIdSaver
+    public class LastIdSettings : IIdSettings
     {
-        private readonly string _path = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/LastCodeReviewId.json");
-        public long GetValueFromFile()
+        private readonly string _path = "JsonSettings/LastId".FullFileLocation();
+        public int Get()
         {
             try
-            {                
+            {
+                if (!File.Exists(_path)) return 1;
                 string text = File.ReadAllText(_path);
                 return int.Parse(text);
             }
@@ -21,10 +21,11 @@ namespace ReviewNotifier.Helpers
             }
         }
 
-        public void SaveValueToFile(int id)
+        public void Save(int id)
         {
             try
             {
+                Directory.CreateDirectory("JsonSettings/".FullFileLocation());
                 File.WriteAllText(_path, id.ToString());
             }
             catch (Exception e)
