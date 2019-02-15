@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using ReviewNotifier.Config;
+using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
 namespace ReviewNotifier.Observer
@@ -55,7 +56,7 @@ namespace ReviewNotifier.Observer
 
         private string GetJsonTemplate()
         {
-            TextReader textReader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/NotificationTemplate.json"));
+            TextReader textReader = new StreamReader("JsonSettings/NotificationTemplate.json".FullFileLocation());
             return textReader.ReadToEnd();
         }
     }
