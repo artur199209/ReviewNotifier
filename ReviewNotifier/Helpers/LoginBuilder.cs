@@ -10,9 +10,9 @@ namespace ReviewNotifier.Helpers
     {
         private readonly IConfiguration _configuration;
 
-        public LoginBuilder()
+        public LoginBuilder(IConfiguration configuration)
         {
-            _configuration = Configuration.ConfigInstance;
+            _configuration = configuration;
         }
 
         public string GetCreateByQuery()
