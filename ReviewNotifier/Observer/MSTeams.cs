@@ -13,10 +13,9 @@ namespace ReviewNotifier.Observer
         private readonly string _webHookUrl;
         private readonly string _json;
 
-        public MsTeams()
+        public MsTeams(string webHookUrl)
         {
-            var configuration = Configuration.ConfigInstance;
-            _webHookUrl = configuration.GetSection("webHookUrl").Value;
+            _webHookUrl = webHookUrl;
             _json = GetJsonTemplate();
         }
 
@@ -27,8 +26,7 @@ namespace ReviewNotifier.Observer
             
             httpWebRequest.Method = "POST";
 
-            var createdBy = message.CreatedBy.Split(" <FENERGO");
-            var filledJsonTemplate = _json.Replace("$CREATEDBY", createdBy[0]).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
+            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {

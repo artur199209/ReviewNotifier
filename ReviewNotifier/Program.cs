@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using ReviewNotifier.Config;
 using System.Threading.Tasks;
 using System.Timers;
 using ReviewNotifier.Helpers;
@@ -30,22 +31,22 @@ namespace ReviewNotifier
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            var configuration = Configuration.ConfigInstance;
+            var webHookUrl = configuration.GetSection("webHookUrl").Value;
             var lastIdSettings = new LastIdSettings();
-            var loginBuilder = new LoginBuilder();
+            var loginBuilder = new LoginBuilder(configuration);
+            var msTeams = new MsTeams(webHookUrl);
 
             var lastId = lastIdSettings.Get();
-            var codeReview = new CodeReview(loginBuilder, lastId);
-            var msg = codeReview.ExecuteWiqlQuery();
-            var tfsServer = new TfsServer();
-            var msTeams = new MsTeams();
-            tfsServer.AttachObserver(msTeams);
+            var tfs = new TfsDataConnector(loginBuilder, lastId);
+            var reviews = tfs.GetReviewData();
 
-            foreach (var item in msg)
+            foreach (var item in reviews)
             {
-                tfsServer.NotifyAll(item);
+                msTeams.Update(item);
             }
 
-            lastId = msg.Any() ? msg.Max(x => x.Id) : 1;
+            lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
             lastIdSettings.Save(lastId);
 
         }
