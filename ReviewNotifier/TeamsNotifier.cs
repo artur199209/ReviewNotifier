@@ -19,13 +19,14 @@ namespace ReviewNotifier
 
         public void Send(CodeReview message)
         {
+            Console.WriteLine("Sending review");
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
             
             httpWebRequest.Method = "POST";
 
             var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
-
+            Console.WriteLine(filledJsonTemplate);
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 streamWriter.Write(filledJsonTemplate);
