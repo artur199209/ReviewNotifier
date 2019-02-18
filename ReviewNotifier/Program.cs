@@ -45,7 +45,7 @@ namespace ReviewNotifier
                 _teams.Send(review);
             }
 
-            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
+            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : Math.Max(_lastId, 1);
             _lastIdSettings.Save(_lastId);
             Console.WriteLine("_____________________________________________");
 
