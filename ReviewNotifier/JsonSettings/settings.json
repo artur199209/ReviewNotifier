@@ -1,5 +1,7 @@
 {
-  "WebHookUrl": "",
+  "webHookUrl": "",
   "tfsUrl": "",
-  "personalAccessTokenToTFS": ""
+  "personalAccessTokenToTFS": "",
+  "developers": [
+  ]
 }
