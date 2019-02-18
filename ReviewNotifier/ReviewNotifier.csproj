@@ -26,9 +26,6 @@
     <None Update="JsonSettings\NotificationTemplate.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="JsonSettings\LastCodeReviewId.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="JsonSettings\settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

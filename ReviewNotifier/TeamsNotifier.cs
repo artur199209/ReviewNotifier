@@ -1,35 +1,30 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
-using ReviewNotifier.Config;
+using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
-namespace ReviewNotifier.Observer
+namespace ReviewNotifier
 {
-    class MsTeams : IObserver
+    public class TeamsNotifier : INotifier
     {
         private readonly string _webHookUrl;
         private readonly string _json;
-        private readonly ILastIdSaver _lastIdSaver;
 
-        public MsTeams(ILastIdSaver lastIdSaver)
+        public TeamsNotifier(string webHookUrl)
         {
-            var configuration = Configuration.ConfigInstance;
-            _webHookUrl = configuration.GetSection("webHookUrl").Value;
+            _webHookUrl = webHookUrl;
             _json = GetJsonTemplate();
-            _lastIdSaver = lastIdSaver;
         }
 
-        public void Update(ReviewInfo message)
+        public void Send(CodeReview message)
         {
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
             
             httpWebRequest.Method = "POST";
 
-            var createdBy = message.CreatedBy.Split(" <FENERGO");
-            var filledJsonTemplate = _json.Replace("$CREATEDBY", createdBy[0]).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
+            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -43,7 +38,6 @@ namespace ReviewNotifier.Observer
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    _lastIdSaver.SaveValueToFile(message.Id);
                     Console.WriteLine(result);
                 }
             }
@@ -55,7 +49,7 @@ namespace ReviewNotifier.Observer
 
         private string GetJsonTemplate()
         {
-            TextReader textReader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "JsonSettings/NotificationTemplate.json"));
+            TextReader textReader = new StreamReader("JsonSettings/NotificationTemplate.json".FullFileLocation());
             return textReader.ReadToEnd();
         }
     }
