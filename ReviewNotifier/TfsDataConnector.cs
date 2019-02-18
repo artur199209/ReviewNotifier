@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using Newtonsoft.Json;
 using ReviewNotifier.Helpers;
 using ReviewNotifier.Models;
 
@@ -14,7 +13,6 @@ namespace ReviewNotifier
     {
         private ILoginBuilder _loginBuilder;
         private string _url;
-        private string _shelvesetUrl;
         private int _lastId;
         private static HttpClient client;
 
