@@ -50,7 +50,7 @@ namespace ReviewNotifier
                 var response = client.PostWithResponse<WorkItemResults>($"{_url}/_apis/wit/wiql?$top=15&api-version=3.0", wiql);
                 if (!response.workItems.Any()) return codeReviews;
                 var joinedWorkItemIds = string.Join(",", response.workItems.Select(x => x.id).Distinct().ToList());
-                var qwe = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,System.CreatedBy,System.Title,System.Id&api-version=3.0";
+                var qwe = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,Microsoft.VSTS.CodeReview.ContextOwner,System.CreatedBy,System.Title,System.Id&api-version=3.0";
                 codeReviews = client.GetWithResponse<WorkItemResults>(qwe).value.Select(x => x.fields).ToList();
                 codeReviews.ForEach(x => x.BuildUrl(_url));
             }
