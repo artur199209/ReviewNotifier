@@ -1,5 +1,4 @@
-﻿
-namespace ReviewNotifier.Models
+﻿namespace ReviewNotifier.Models
 {
     public class WorkItemResults
     {

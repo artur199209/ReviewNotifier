@@ -1,5 +1,4 @@
-﻿
-using ReviewNotifier.Models;
+﻿using ReviewNotifier.Models;
 
 namespace ReviewNotifier
 {

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using ReviewNotifier.Helpers;
+using System;
 using System.Linq;
 using System.Timers;
-using ReviewNotifier.Helpers;
-using ReviewNotifier.Models;
 
 namespace ReviewNotifier
 {
