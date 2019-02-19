@@ -21,7 +21,7 @@ namespace ReviewNotifier
             _lastIdSettings = new LastIdSettings();
             _lastId = _lastIdSettings.Get();
             _teams = new TeamsNotifier(settings.WebHookUrl);
-            _tfs = new TfsDataConnector(settings, loginBuilder, _lastId);
+            _tfs = new TfsDataConnector(settings, loginBuilder);
 
             var timer = new Timer
             {
@@ -37,15 +37,17 @@ namespace ReviewNotifier
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            var reviews = _tfs.GetReviewData();
+            Console.WriteLine("Getting reviews");
+            var reviews = _tfs.GetReviewData(_lastId);
 
             foreach (var review in reviews)
             {
                 _teams.Send(review);
             }
 
-            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : 1;
+            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : Math.Max(_lastId, 1);
             _lastIdSettings.Save(_lastId);
+            Console.WriteLine("_____________________________________________");
 
         }
     }
