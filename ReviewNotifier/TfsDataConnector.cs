@@ -21,7 +21,6 @@ namespace ReviewNotifier
         {
             _url = settings.TfsUrl;
             _loginBuilder = loginBuilder;
-            _lastId = lastId;
             _codeReviewCount = settings.CodeReviewCount;
 
             client = new HttpClient();
@@ -54,7 +53,7 @@ namespace ReviewNotifier
                 Console.WriteLine(wiUrl);
                 if (!response.workItems.Any()) return codeReviews;
                 Console.WriteLine($"Got {response.workItems.Count()} responses");
-                var joinedWorkItemIds = string.Join(",", response.workItems.Select(x => x.id).Distinct().ToList());
+                var joinedWorkItemIds = string.Join(",", response.workItems.Select(x => x.id).Distinct().Take(_codeReviewCount).ToList());
                 var qwe = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,Microsoft.VSTS.CodeReview.ContextOwner,System.CreatedBy,System.Title,System.Id&api-version=3.0";
                 Console.WriteLine("Downloaded work itemdata");
                 codeReviews = client.GetWithResponse<WorkItemResults>(qwe).value.Select(x => x.fields).ToList();
