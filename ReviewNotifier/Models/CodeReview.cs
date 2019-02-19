@@ -21,7 +21,7 @@ namespace ReviewNotifier.Models
 
         public void BuildUrl(string tfsUrl)
         {
-            WorkItemUrl = $"{tfsUrl}_versionControl/shelvesets?ss={Context};{ContextOwner}";
+            WorkItemUrl = $"{tfsUrl}/FenergoCore/_versionControl/shelveset?ss={Context};{ContextOwner}";
         }
     }
 }
