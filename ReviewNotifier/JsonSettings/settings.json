@@ -1,8 +1,13 @@
 {
-  "webHookUrl": "",
-  "tfsUrl": "",
-  "personalAccessTokenToTFS": "",
-  "codeReviewCount": 1, 
+  "webHookUrl": "https://outlook.office.com/webhook/ea8b7d46-6115-4632-9159-50a57096d9dc@86eb5cdc-05d5-4952-b36d-bc110af1e2e5/TeamFoundationServer/222eae7c660b404a9e17d7037dcd3770/ceb63abe-cf00-4f2e-96d9-e13f45098e52",
+  "tfsUrl": "https://secure.fenergo.com/tfs/Product",
+  "personalAccessTokenToTFS": "ldah7kzgi7qoygkgqasz7cqz2pylth4mfvvcnrrmei67wrhn4xbq",
+  "codeReviewCount": 1,
   "developers": [
+    "Justyna Witkowska <FENERGO\\JWitkowska>",
+    "Grzegorz Slazak <FENERGO\\GSlazak>",
+    "Marek Sobieraj <FENERGO\\MSobieraj>",
+    "Lukasz Idziak <FENERGO\\LIdziak>",
+    "Artur Snioszek <FENERGO\\ASnioszek>"
   ]
 }
