@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using ReviewNotifier.Helpers;
+using ReviewNotifier.Interfaces;
 using ReviewNotifier.Models;
 
 namespace ReviewNotifier

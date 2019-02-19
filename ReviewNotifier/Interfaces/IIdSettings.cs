@@ -1,4 +1,4 @@
-﻿namespace ReviewNotifier
+﻿namespace ReviewNotifier.Interfaces
 {
     interface IIdSettings
     {

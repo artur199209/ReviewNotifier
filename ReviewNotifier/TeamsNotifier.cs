@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using ReviewNotifier.Helpers;
+using ReviewNotifier.Interfaces;
 using ReviewNotifier.Models;
 
 namespace ReviewNotifier
