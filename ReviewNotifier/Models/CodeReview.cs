@@ -15,11 +15,13 @@ namespace ReviewNotifier.Models
         public string CreatedBy { get; set; }
         [DataMember(Name = "Microsoft.VSTS.CodeReview.Context")]
         public string Context { get; set; }
+        [DataMember(Name = "Microsoft.VSTS.CodeReview.ContextOwner")]
+        public string ContextOwner { get; set; }
         public string WorkItemUrl { get; set; }
 
         public void BuildUrl(string tfsUrl)
         {
-            WorkItemUrl = $"{tfsUrl}_versionControl/shelvesets?ss={Context};{CreatedBy}";
+            WorkItemUrl = $"{tfsUrl}_versionControl/shelvesets?ss={Context};{ContextOwner}";
         }
     }
 }
