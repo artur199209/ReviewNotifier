@@ -12,11 +12,10 @@ namespace ReviewNotifier
 {
     class TfsDataConnector
     {
-        private ILoginBuilder _loginBuilder;
-        private string _url;
-        private int _lastId;
-        private int _codeReviewCount;
-        private static HttpClient client;
+        private readonly ILoginBuilder _loginBuilder;
+        private readonly string _url;
+        private readonly int _codeReviewCount;
+        private static HttpClient _client;
 
         public TfsDataConnector(Settings settings, ILoginBuilder loginBuilder)
         {
@@ -24,9 +23,9 @@ namespace ReviewNotifier
             _loginBuilder = loginBuilder;
             _codeReviewCount = settings.CodeReviewCount;
 
-            client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format(":{0}", settings.PersonalAccessTokenToTFS))));
+            _client = new HttpClient();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format(":{0}", settings.PersonalAccessTokenToTFS))));
         }
 
         private string PrepareWiqlQuery(int lastId)
@@ -50,14 +49,14 @@ namespace ReviewNotifier
             try
             {
                 var wiUrl = $"{_url}/_apis/wit/wiql?$top=15&api-version=3.0";
-                var response = client.PostWithResponse<WorkItemResults>(wiUrl, wiql);
+                var response = _client.PostWithResponse<WorkItemResults>(wiUrl, wiql);
                 Console.WriteLine(wiUrl);
                 if (!response.workItems.Any()) return codeReviews;
                 Console.WriteLine($"Got {response.workItems.Count()} responses");
                 var joinedWorkItemIds = string.Join(",", response.workItems.Select(x => x.id).Distinct().Take(_codeReviewCount).ToList());
                 var qwe = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,Microsoft.VSTS.CodeReview.ContextOwner,System.CreatedBy,System.Title,System.Id&api-version=3.0";
                 Console.WriteLine("Downloaded work itemdata");
-                codeReviews = client.GetWithResponse<WorkItemResults>(qwe).value.Select(x => x.fields).ToList();
+                codeReviews = _client.GetWithResponse<WorkItemResults>(qwe).value.Select(x => x.fields).ToList();
                 codeReviews.ForEach(x => x.BuildUrl(_url));
             }
             catch (Exception ex)
