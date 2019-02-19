@@ -1,6 +1,4 @@
-﻿
-
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace ReviewNotifier.Models
 {
@@ -21,7 +19,7 @@ namespace ReviewNotifier.Models
 
         public void BuildUrl(string tfsUrl)
         {
-            WorkItemUrl = $"{tfsUrl}/FenergoCore/_versionControl/shelveset?ss={Context};{ContextOwner}";
+            WorkItemUrl = $"{tfsUrl}/_versionControl/shelveset?ss={Context};{ContextOwner}";
         }
     }
 }
