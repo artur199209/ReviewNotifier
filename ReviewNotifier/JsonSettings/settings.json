@@ -2,6 +2,7 @@
   "webHookUrl": "",
   "tfsUrl": "",
   "personalAccessTokenToTFS": "",
+  "codeReviewCount": 1, 
   "developers": [
   ]
 }
