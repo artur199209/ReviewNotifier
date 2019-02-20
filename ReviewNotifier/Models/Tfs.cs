@@ -2,18 +2,18 @@
 {
     public class WorkItemResults
     {
-        public Workitem[] workItems { get; set; }
-        public WorkItemDataWrapper[] value { get; set; }
+        public Workitem[] WorkItems { get; set; }
+        public WorkItemDataWrapper[] Value { get; set; }
     }
 
     public class Workitem
     {
-        public int id { get; set; }
-        public string url { get; set; }
+        public int Id { get; set; }
+        public string Url { get; set; }
     }
 
     public class WorkItemDataWrapper
     {
-        public CodeReview fields { get; set; }
+        public CodeReview Fields { get; set; }
     }
 }
