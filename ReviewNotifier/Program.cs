@@ -16,8 +16,9 @@ namespace ReviewNotifier
         {
             var settings = new Config().GetSettings();
             var loginBuilder = new LoginBuilder(settings);
-
             _lastIdSettings = new LastIdSettings();
+            Logger.SaveLog("Getting lastID from file...");
+            Console.WriteLine("Getting lastID from file...");
             _lastId = _lastIdSettings.Get();
             _teams = new TeamsNotifier(settings.WebHookUrl);
             _tfs = new TfsDataConnector(settings, loginBuilder);
@@ -29,15 +30,18 @@ namespace ReviewNotifier
             };
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
-            //Timer_Elapsed(null, null);
+
             Console.ReadKey();
         }
 
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            Logger.SaveLog("Getting reviews");
             Console.WriteLine("Getting reviews");
             var reviews = _tfs.GetReviewData(_lastId);
+
+            Logger.SaveLog("Sending info to Teams...");
 
             foreach (var review in reviews)
             {
@@ -45,7 +49,10 @@ namespace ReviewNotifier
             }
 
             _lastId = reviews.Any() ? reviews.Max(x => x.Id) : Math.Max(_lastId, 1);
+            Logger.SaveLog("Saving ID...");
+            Console.WriteLine("Saving ID...");
             _lastIdSettings.Save(_lastId);
+            Logger.SaveLog("_____________________________________________");
             Console.WriteLine("_____________________________________________");
 
         }
