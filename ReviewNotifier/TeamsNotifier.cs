@@ -21,8 +21,7 @@ namespace ReviewNotifier
 
         public void Send(CodeReview message)
         {
-            Logger.SaveLog("Sending review");
-            Console.WriteLine("Sending review");
+            Logger.Write("Sending review");
 
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
@@ -30,8 +29,7 @@ namespace ReviewNotifier
 
             var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
 
-            Logger.SaveLog(filledJsonTemplate);
-            Console.WriteLine(filledJsonTemplate);
+            Logger.Write(filledJsonTemplate);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -45,14 +43,12 @@ namespace ReviewNotifier
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    Logger.SaveLog("Http Response " + result);
-                    Console.WriteLine(result);
+                    Logger.Write("Http Response " + result);
                 }
             }
             catch (Exception ex)
             {
-                Logger.SaveLog(ex.Message);
-                Console.WriteLine(ex.Message);
+                Logger.Write(ex.Message);
             }
         }
 

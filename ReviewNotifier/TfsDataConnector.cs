@@ -43,32 +43,27 @@ namespace ReviewNotifier
 
         public List<CodeReview> GetReviewData(int lastId)
         {
-            Logger.SaveLog("Preparing query...");
+            Logger.Write("Preparing query...");
             var wiql = PrepareWiqlQuery(lastId);
-            Logger.SaveLog($"wiql {wiql}");
-            Console.WriteLine($"wiql {wiql}");
+            Logger.Write($"wiql {wiql}");
             var codeReviews = new List<CodeReview>();
 
             try
             {
                 var wiUrl = $"{_url}/_apis/wit/wiql?$top=15&api-version=3.0";
                 var response = _client.PostWithResponse<WorkItemResults>(wiUrl, wiql);
-                Logger.SaveLog(wiUrl);
-                Console.WriteLine(wiUrl);
+                Logger.Write(wiUrl);
                 if (!response.WorkItems.Any()) return codeReviews;
-                Logger.SaveLog($"Got {response.WorkItems.Length} responses");
-                Console.WriteLine($"Got {response.WorkItems.Length} responses");
+                Logger.Write($"Got {response.WorkItems.Length} responses");
                 var joinedWorkItemIds = string.Join(",", response.WorkItems.Select(x => x.Id).Distinct().Take(_codeReviewCount).ToList());
                 var witUrl = $"{_url}/_apis/wit/WorkItems?ids={joinedWorkItemIds}&fields=Microsoft.VSTS.CodeReview.Context,Microsoft.VSTS.CodeReview.ContextOwner,System.CreatedBy,System.Title,System.Id&api-version=3.0";
-                Logger.SaveLog("Downloaded work itemdata");
-                Console.WriteLine("Downloaded work itemdata");
+                Logger.Write("Downloaded work itemdata");
                 codeReviews = _client.GetWithResponse<WorkItemResults>(witUrl).Value.Select(x => x.Fields).ToList();
                 codeReviews.ForEach(x => x.BuildUrl(_url));
             }
             catch (Exception ex)
             {
-                Logger.SaveLog(ex.Message);
-                Console.WriteLine(ex.Message);
+                Logger.Write(ex.Message);
             }
             
             return codeReviews;

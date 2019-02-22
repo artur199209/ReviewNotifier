@@ -17,8 +17,7 @@ namespace ReviewNotifier.Helpers
             }
             catch (Exception e)
             {
-                Logger.SaveLog(e.Message);
-                Console.WriteLine(e.Message);
+                Logger.Write(e.Message);
                 throw;
             }
         }
@@ -32,8 +31,7 @@ namespace ReviewNotifier.Helpers
             }
             catch (Exception e)
             {
-                Logger.SaveLog(e.Message);
-                Console.WriteLine(e);
+                Logger.Write(e.Message);
                 throw;
             }
         }
