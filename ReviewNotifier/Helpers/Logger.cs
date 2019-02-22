@@ -12,7 +12,7 @@ namespace ReviewNotifier.Helpers
             try
             {
                 Directory.CreateDirectory("Logs/".FullFileLocation());
-                File.AppendAllText(Path, messsage);
+                File.AppendAllText(Path, messsage +  Environment.NewLine);
             }
             catch (Exception ex)
             {
