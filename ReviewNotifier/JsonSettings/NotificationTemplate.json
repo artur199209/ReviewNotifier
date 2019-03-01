@@ -5,7 +5,7 @@
   "summary": "A new code review!",
   "sections": [
     {
-      "title": "**A new code review**",
+      "title": "**A new code review by $NAME **",
       "facts": [
         {
           "name": "Title:",
