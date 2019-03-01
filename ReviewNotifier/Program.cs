@@ -1,7 +1,11 @@
 ﻿using ReviewNotifier.Helpers;
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Timers;
+using System.Xml;
+using log4net;
 
 namespace ReviewNotifier
 {
@@ -11,13 +15,21 @@ namespace ReviewNotifier
         private static TeamsNotifier _teams;
         private static TfsDataConnector _tfs;
         private static int _lastId;
+        private static ILog _logger;
 
         static void Main(string[] args)
         {
+            XmlDocument log4NetConfig = new XmlDocument();
+            log4NetConfig.Load(File.OpenRead("log4net.config"));
+            var repo = LogManager.CreateRepository(Assembly.GetEntryAssembly(),
+                typeof(log4net.Repository.Hierarchy.Hierarchy));
+            log4net.Config.XmlConfigurator.Configure(repo, log4NetConfig["log4net"]);
+            _logger = Log4NetConfig.GetLogger();
+            
             var settings = new Config().GetSettings();
             var loginBuilder = new LoginBuilder(settings);
             _lastIdSettings = new LastIdSettings();
-            Logger.Write("Getting lastID from file...");
+            _logger.Info("Getting lastID from file...");
             _lastId = _lastIdSettings.Get();
             _teams = new TeamsNotifier(settings.WebHookUrl);
             _tfs = new TfsDataConnector(settings, loginBuilder);
@@ -33,13 +45,12 @@ namespace ReviewNotifier
             Console.ReadKey();
         }
 
-        
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Logger.Write("Getting reviews");
+            _logger.Info("Getting reviews");
             var reviews = _tfs.GetReviewData(_lastId);
 
-            Logger.Write("Sending info to Teams...");
+            _logger.Info("Sending info to Teams...");
 
             foreach (var review in reviews)
             {
@@ -47,9 +58,9 @@ namespace ReviewNotifier
             }
 
             _lastId = reviews.Any() ? reviews.Max(x => x.Id) : Math.Max(_lastId, 1);
-            Logger.Write("Saving ID...");
+            _logger.Info("Saving ID...");
             _lastIdSettings.Save(_lastId);
-            Logger.Write("_____________________________________________");
+            _logger.Info("_____________________________________________");
 
         }
     }

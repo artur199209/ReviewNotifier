@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using log4net;
 using ReviewNotifier.Interfaces;
 
 namespace ReviewNotifier.Helpers
@@ -7,6 +8,8 @@ namespace ReviewNotifier.Helpers
     public class LastIdSettings : IIdSettings
     {
         private readonly string _path = "JsonSettings/LastId".FullFileLocation();
+        private readonly ILog _logger = Log4NetConfig.GetLogger();
+
         public int Get()
         {
             try
@@ -15,9 +18,9 @@ namespace ReviewNotifier.Helpers
                 string text = File.ReadAllText(_path);
                 return int.Parse(text);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Write(e.Message);
+                _logger.Error(ex.Message);
                 throw;
             }
         }
@@ -29,9 +32,9 @@ namespace ReviewNotifier.Helpers
                 Directory.CreateDirectory("JsonSettings/".FullFileLocation());
                 File.WriteAllText(_path, id.ToString());
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Write(e.Message);
+                _logger.Error(ex.Message);
                 throw;
             }
         }

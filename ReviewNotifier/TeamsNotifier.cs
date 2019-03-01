@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Xml.Linq;
+using log4net;
 using ReviewNotifier.Helpers;
 using ReviewNotifier.Interfaces;
 using ReviewNotifier.Models;
@@ -12,25 +12,23 @@ namespace ReviewNotifier
     {
         private readonly string _webHookUrl;
         private readonly string _json;
+        private readonly ILog _logger;
 
         public TeamsNotifier(string webHookUrl)
         {
             _webHookUrl = webHookUrl;
             _json = GetJsonTemplate();
+            _logger = Log4NetConfig.GetLogger();
         }
 
         public void Send(CodeReview message)
         {
-            Logger.Write("Sending review");
-
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
             var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
-
-            Logger.Write(filledJsonTemplate);
-
+            
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 streamWriter.Write(filledJsonTemplate);
@@ -43,12 +41,20 @@ namespace ReviewNotifier
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    Logger.Write("Http Response " + result);
+                    _logger.Info("Http response: " + result);
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.Error(ex.Message);
+            }
+            catch (NotSupportedException ex)
+            {
+                _logger.Error(ex.Message);
             }
             catch (Exception ex)
             {
-                Logger.Write(ex.Message);
+                _logger.Error(ex.Message);
             }
         }
 
