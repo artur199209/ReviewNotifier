@@ -31,7 +31,7 @@ namespace ReviewNotifier
             
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                //streamWriter.Write(filledJsonTemplate);
+                streamWriter.Write(filledJsonTemplate);
             }
 
             try
