@@ -27,11 +27,11 @@ namespace ReviewNotifier
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
-            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl);
+            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl).Replace("$NAME", message.CreatedBy.Replace("\\", "\\\\"));
             
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                streamWriter.Write(filledJsonTemplate);
+                //streamWriter.Write(filledJsonTemplate);
             }
 
             try
