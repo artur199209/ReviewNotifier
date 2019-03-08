@@ -20,12 +20,13 @@ namespace ReviewNotifier
         static void Main(string[] args)
         {
             XmlDocument log4NetConfig = new XmlDocument();
-            log4NetConfig.Load(File.OpenRead("log4net.config"));
+            var log4NetConfigPath = "log4net.config".FullFileLocation();
+            log4NetConfig.Load(File.OpenRead(log4NetConfigPath));
             var repo = LogManager.CreateRepository(Assembly.GetEntryAssembly(),
-                typeof(log4net.Repository.Hierarchy.Hierarchy));
+            typeof(log4net.Repository.Hierarchy.Hierarchy));
             log4net.Config.XmlConfigurator.Configure(repo, log4NetConfig["log4net"]);
             _logger = Log4NetConfig.GetLogger();
-            
+
             var settings = new Config().GetSettings();
             var loginBuilder = new LoginBuilder(settings);
             _lastIdSettings = new LastIdSettings();
@@ -41,7 +42,6 @@ namespace ReviewNotifier
             };
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
-
             Console.ReadKey();
         }
 
@@ -57,9 +57,6 @@ namespace ReviewNotifier
                 _teams.Send(review);
             }
 
-            _lastId = reviews.Any() ? reviews.Max(x => x.Id) : Math.Max(_lastId, 1);
-            _logger.Info("Saving ID...");
-            _lastIdSettings.Save(_lastId);
             _logger.Info("_____________________________________________");
 
         }
