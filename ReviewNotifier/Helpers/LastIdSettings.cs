@@ -21,6 +21,7 @@ namespace ReviewNotifier.Helpers
             catch (Exception ex)
             {
                 _logger.Error(ex.Message);
+                _logger.Error(ex.StackTrace);
                 throw;
             }
         }
@@ -35,6 +36,7 @@ namespace ReviewNotifier.Helpers
             catch (Exception ex)
             {
                 _logger.Error(ex.Message);
+                _logger.Error(ex.StackTrace);
                 throw;
             }
         }

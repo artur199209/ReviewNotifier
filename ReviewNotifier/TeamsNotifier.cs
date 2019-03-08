@@ -13,12 +13,14 @@ namespace ReviewNotifier
         private readonly string _webHookUrl;
         private readonly string _json;
         private readonly ILog _logger;
+        private readonly LastIdSettings _lastIdSettings;
 
         public TeamsNotifier(string webHookUrl)
         {
             _webHookUrl = webHookUrl;
             _json = GetJsonTemplate();
             _logger = Log4NetConfig.GetLogger();
+            _lastIdSettings = new LastIdSettings();
         }
 
         public void Send(CodeReview message)
@@ -41,20 +43,27 @@ namespace ReviewNotifier
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
+
+                    if (result == "1")
+                    {
+                        _logger.Info("Saving ID");
+                        _lastIdSettings.Save(message.Id);
+                    }
+
                     _logger.Info("Http response: " + result);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error(ex.StackTrace);
             }
             catch (NotSupportedException ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error(ex.StackTrace);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error(ex.StackTrace);
             }
         }
 
