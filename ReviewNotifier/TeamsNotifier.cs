@@ -29,7 +29,10 @@ namespace ReviewNotifier
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
-            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\")).Replace("$TITLE", message.Title).Replace("$WORKITEMURL", message.WorkItemUrl).Replace("$NAME", message.CreatedBy.Replace("\\", "\\\\"));
+            var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\"))
+                .Replace("$TITLE", message.Title.Replace("\"", "\\\""))
+                .Replace("$WORKITEMURL", message.WorkItemUrl)
+                .Replace("$NAME", message.CreatedBy.Replace("\\", "\\\\"));
             
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -55,14 +58,17 @@ namespace ReviewNotifier
             }
             catch (InvalidOperationException ex)
             {
+                _logger.Error(ex.InnerException);
                 _logger.Error(ex.StackTrace);
             }
             catch (NotSupportedException ex)
             {
+                _logger.Error(ex.InnerException);
                 _logger.Error(ex.StackTrace);
             }
             catch (Exception ex)
             {
+                _logger.Error(ex.InnerException);
                 _logger.Error(ex.StackTrace);
             }
         }
