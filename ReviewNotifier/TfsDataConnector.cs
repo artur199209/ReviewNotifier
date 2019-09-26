@@ -35,10 +35,16 @@ namespace ReviewNotifier
             var createdByQuery = _loginBuilder.GetCreateByQuery();
             var query = "Select [ID] From WorkItems " +
                         " Where [Work Item Type] = 'Code Review Request' " +
-                        " And [State] = 'Requested' " +
-                        " And [System.CreatedBy] in " + createdByQuery +
-                        " And [ID] > " + lastId +
-                        " Order By [Created Date] DESC";
+                        " And [State] = 'Closed' ";
+
+            if (!string.IsNullOrEmpty(createdByQuery))
+            {
+                query += " And [System.CreatedBy] in " + createdByQuery;
+            }
+            
+            query += " And [ID] > " + lastId +
+                     " Order By [Created Date] DESC";
+
             return query;
         }
 
@@ -64,7 +70,7 @@ namespace ReviewNotifier
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error(ex.InnerException);
                 _logger.Error(ex.StackTrace);
             }
             
