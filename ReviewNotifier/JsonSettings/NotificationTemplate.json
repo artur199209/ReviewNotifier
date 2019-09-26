@@ -2,10 +2,10 @@
   "@type": "MessageCard",
   "@context": "http://schema.org/extensions",
   "themeColor": "0076D7",
-  "summary": "A new code review!",
+  "summary": "A new code review by $NAME!",
   "sections": [
     {
-      "title": "**A new code review by $NAME **",
+      "title": "**A new code review**",
       "facts": [
         {
           "name": "Title:",
