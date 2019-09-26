@@ -1,7 +1,6 @@
 ﻿using ReviewNotifier.Helpers;
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Timers;
 using System.Xml;
@@ -48,6 +47,7 @@ namespace ReviewNotifier
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _logger.Info("Getting reviews");
+            _lastId = _lastIdSettings.Get();
             var reviews = _tfs.GetReviewData(_lastId);
 
             _logger.Info("Sending info to Teams...");
