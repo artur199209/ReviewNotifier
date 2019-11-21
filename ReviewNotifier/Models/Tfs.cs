@@ -14,6 +14,6 @@
 
     public class WorkItemDataWrapper
     {
-        public CodeReview Fields { get; set; }
+        public WorkItemData Fields { get; set; }
     }
 }

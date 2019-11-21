@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using log4net;
 using ReviewNotifier.Helpers;
@@ -23,15 +24,17 @@ namespace ReviewNotifier
             _lastIdSettings = new LastIdSettings();
         }
 
-        public void Send(CodeReview message)
+        public void Send(WorkItemData message)
         {
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
+            var sas = message.WorkItems.Aggregate("", (current, messageWorkItem) => current + $"{{\"name\": \"{messageWorkItem.Id}:\",\"value\": \"[{messageWorkItem.Title}]({messageWorkItem.Url})\"}},");
 
             var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\"))
                 .Replace("$TITLE", message.Title.Replace("\"", "\\\""))
-                .Replace("$WORKITEMURL", message.WorkItemUrl)
+                .Replace("$WORKITEMURL", message.Url)
+                .Replace("$WorkItems", sas)
                 .Replace("$NAME", message.CreatedBy.Replace("\\", "\\\\"));
             
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
