@@ -50,7 +50,7 @@ namespace ReviewNotifier
             var createdByQuery = _loginBuilder.GetCreateByQuery();
             var query = "Select [ID] From WorkItems " +
                         " Where [Work Item Type] = 'Code Review Request' " +
-                        " And [State] = 'Closed' ";
+                        " And [State] = 'Requested' ";
 
             if (!string.IsNullOrEmpty(createdByQuery))
             {
