@@ -15,6 +15,7 @@
           "name": "Created by:",
           "value": "$CREATEDBY"
         },
+        $WorkItems
         {
           "name": "Link:",
           "value": "[Open changes]($WORKITEMURL)"
