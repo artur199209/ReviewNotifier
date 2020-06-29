@@ -29,45 +29,48 @@ namespace ReviewNotifier
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(_webHookUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
-            var sas = message.WorkItems.Aggregate("", (current, messageWorkItem) => current + $"{{\"name\": \"{messageWorkItem.Id}:\",\"value\": \"[{messageWorkItem.Title}]({messageWorkItem.Url})\"}},");
+            var workItemsAggregated = message.WorkItems.Aggregate("", (current, messageWorkItem) => current + $"{{\"name\": \"{messageWorkItem.Id}:\",\"value\": \"[{messageWorkItem.Title.Replace("\"", "\\\"")}]({messageWorkItem.Url})\"}},");
 
             var filledJsonTemplate = _json.Replace("$CREATEDBY", message.CreatedBy.Replace("\\","\\\\"))
                 .Replace("$TITLE", message.Title.Replace("\"", "\\\""))
                 .Replace("$WORKITEMURL", message.Url)
-                .Replace("$WorkItems", sas)
+                .Replace("$WorkItems", workItemsAggregated)
                 .Replace("$NAME", message.CreatedBy.Replace("\\", "\\\\"));
-            
-            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-            {
-                streamWriter.Write(filledJsonTemplate);
-            }
+
+            _logger.Info("Filled json: " + filledJsonTemplate);
 
             try
             {
-                var httpResponse = httpWebRequest.GetResponse();
-
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                 {
-                    var result = streamReader.ReadToEnd();
+                    streamWriter.Write(filledJsonTemplate);
+                }
 
-                    if (result == "1")
+                using (var httpWebResponse = (HttpWebResponse) httpWebRequest.GetResponse())
+                {
+                    using (var streamReader = new StreamReader(httpWebResponse.GetResponseStream()))
                     {
-                        _logger.Info("Saving ID");
-                        _lastIdSettings.Save(message.Id);
+                        var result = streamReader.ReadToEnd();
+
+                        if (result == "1")
+                        {
+                            _logger.Info("Saving ID");
+                            _lastIdSettings.Save(message.Id);
+                        }
+
+                        _logger.Info("Http response: " + result);
                     }
 
-                    _logger.Info("Http response: " + result);
+                    httpWebResponse.Close();
                 }
             }
-            catch (InvalidOperationException ex)
+            catch (WebException ex)
             {
-                _logger.Error(ex.InnerException);
-                _logger.Error(ex.StackTrace);
-            }
-            catch (NotSupportedException ex)
-            {
-                _logger.Error(ex.InnerException);
-                _logger.Error(ex.StackTrace);
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    _logger.Error(reader.ReadToEnd());
+                }
             }
             catch (Exception ex)
             {
