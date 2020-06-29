@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Timers;
 using System.Xml;
 using log4net;
 
@@ -34,18 +33,6 @@ namespace ReviewNotifier
             _teams = new TeamsNotifier(settings.WebHookUrl);
             _tfs = new TfsDataConnector(settings, loginBuilder);
 
-            var timer = new Timer
-            {
-                AutoReset = true,
-                Interval = 60000
-            };
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-            Console.ReadKey();
-        }
-
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
             _logger.Info("Getting reviews");
             _lastId = _lastIdSettings.Get();
             var reviews = _tfs.GetReviewData(_lastId);
@@ -59,6 +46,7 @@ namespace ReviewNotifier
 
             _logger.Info("_____________________________________________");
 
+            Console.ReadKey();
         }
     }
 }
