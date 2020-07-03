@@ -45,8 +45,6 @@ namespace ReviewNotifier
             }
 
             _logger.Info("_____________________________________________");
-
-            Console.ReadKey();
         }
     }
 }
